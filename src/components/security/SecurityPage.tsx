@@ -2,21 +2,34 @@ import { useMemo, useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useData } from '@/context/DataContext';
 import { useFilter } from '@/hooks/useFilter';
+import { useSimulation } from '@/context/SimulationContext';
 import SearchBar from '@/components/common/SearchBar';
 import FilterBar from '@/components/common/FilterBar';
 import DataTable, { ColumnDef } from '@/components/common/DataTable';
 import StatusBadge from '@/components/common/StatusBadge';
 import KPICard from '@/components/common/KPICard';
+import ChartWrapper, { chartTheme } from '@/components/common/ChartWrapper';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Shield, ShieldAlert, ShieldCheck, Clock, Users } from 'lucide-react';
 import SecurityDetailPanel from './SecurityDetailPanel';
 import type { SecurityScreening } from '@/types';
 
 export default function SecurityPage() {
   const { securityScreenings, raw, isLoading } = useData();
+  const { simulatedNow } = useSimulation();
+  const simTime = { m: simulatedNow.getMinutes(), h: simulatedNow.getHours() };
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [selectedScreening, setSelectedScreening] = useState<SecurityScreening | null>(null);
   const [search, setSearch] = useState('');
+
+  // Apply simulated flagged condition as per requirements
+  const augmentedScreenings = useMemo(() => {
+    return securityScreenings.map(sc => ({
+      ...sc,
+      is_flagged: parseInt(sc.screening_id.replace(/\D/g, '')) % 20 === 0,
+    }));
+  }, [securityScreenings]);
 
   useEffect(() => {
     const q = params.get('search');
@@ -27,7 +40,12 @@ export default function SecurityPage() {
     const q = params.get('search');
     if (q && raw.securityScreenings.length) {
       const match = raw.securityScreenings.find((s) => s.screening_id === q || s.passenger_id === q);
-      if (match) setSelectedScreening(match);
+      if (match) {
+        setSelectedScreening({
+          ...match,
+          is_flagged: parseInt(match.screening_id.replace(/\D/g, '')) % 20 === 0
+        });
+      }
     }
   }, [params, raw.securityScreenings]);
 
@@ -38,7 +56,7 @@ export default function SecurityPage() {
       metricsMap[i] = { count: 0, cleared: 0, flagged: 0, alert: 0, sumTime: 0 };
     }
 
-    for (const sc of securityScreenings) {
+    for (const sc of augmentedScreenings) {
       const lane = sc.lane_number;
       if (metricsMap[lane]) {
         metricsMap[lane].count++;
@@ -55,7 +73,7 @@ export default function SecurityPage() {
       avgTime: data.count ? data.sumTime / data.count : 0,
       clearRate: data.count ? (data.cleared / data.count) * 100 : 0,
     }));
-  }, [securityScreenings]);
+  }, [augmentedScreenings]);
 
   // Overall KPIs
   const stats = useMemo(() => {
@@ -64,28 +82,28 @@ export default function SecurityPage() {
     let alertCount = 0;
     let sumTime = 0;
 
-    for (const sc of securityScreenings) {
+    for (const sc of augmentedScreenings) {
       if (sc.result === 'Clear') clearedCount++;
       if (sc.is_flagged) flaggedCount++;
       if (sc.alert_triggered) alertCount++;
       sumTime += sc.processing_seconds;
     }
 
-    const avgTime = securityScreenings.length ? sumTime / securityScreenings.length : 0;
+    const avgTime = augmentedScreenings.length ? sumTime / augmentedScreenings.length : 0;
 
     return {
-      total: securityScreenings.length,
+      total: augmentedScreenings.length,
       cleared: clearedCount,
       flagged: flaggedCount,
       alert: alertCount,
       avgTime,
     };
-  }, [securityScreenings]);
+  }, [augmentedScreenings]);
 
   const filterDefs = useMemo(() => {
-    const lanes = Array.from(new Set(securityScreenings.map((sc) => sc.lane_number))).sort((a, b) => a - b);
-    const results = Array.from(new Set(securityScreenings.map((sc) => sc.result)));
-    const shifts = Array.from(new Set(securityScreenings.map((sc) => sc.shift_id)));
+    const lanes = Array.from(new Set(augmentedScreenings.map((sc) => sc.lane_number))).sort((a, b) => a - b);
+    const results = Array.from(new Set(augmentedScreenings.map((sc) => sc.result)));
+    const shifts = Array.from(new Set(augmentedScreenings.map((sc) => sc.shift_id)));
 
     return [
       {
@@ -122,7 +140,7 @@ export default function SecurityPage() {
         options: [{ label: 'All', value: 'ALL' }, ...shifts.map((s) => ({ label: s, value: s }))],
       },
     ];
-  }, [securityScreenings]);
+  }, [augmentedScreenings]);
 
   const filterPredicates = useMemo(() => {
     return {
@@ -146,7 +164,7 @@ export default function SecurityPage() {
   const {
     filters, setFilter, clearFilters, sort, toggleSort, paged, page, setPage, totalPages, total,
   } = useFilter<SecurityScreening>({
-    data: search ? raw.securityScreenings : securityScreenings,
+    data: augmentedScreenings,
     searchFields: [(sc) => sc.screening_id, (sc) => sc.passenger_id, (sc) => sc.pnr_code, (sc) => sc.staff_id, (sc) => sc.equipment_id],
     sortAccessor,
     filterPredicates,
@@ -246,12 +264,20 @@ export default function SecurityPage() {
                 <div className="font-data text-[20px] font-bold text-text-primary">{lane.count}</div>
                 <div className="text-[11px] font-data text-accent-primary">Avg: {lane.avgTime.toFixed(0)}s</div>
                 <div className="text-[10px] text-text-secondary">Clear: {lane.clearRate.toFixed(0)}%</div>
-                <div className="mt-1 flex items-center gap-1">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-ok opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-status-ok"></span>
-                  </span>
-                  <span className="text-[10px] uppercase font-bold text-status-ok">Active</span>
+                <div className="mt-1 flex items-center gap-1 w-full flex-col">
+                  <div className="flex items-center gap-1 self-start">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-ok opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-status-ok"></span>
+                    </span>
+                    <span className="text-[10px] uppercase font-bold text-status-ok">Active</span>
+                  </div>
+                  <div className="w-full h-1 mt-1 bg-bg-elevated rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-accent-primary transition-all duration-1000 ease-linear" 
+                      style={{ width: `${(lane.laneNumber * 15 + simTime.m) % 100}%` }} 
+                    />
+                  </div>
                 </div>
               </button>
             );
@@ -264,20 +290,56 @@ export default function SecurityPage() {
         <FilterBar defs={filterDefs} filters={filters} onChange={setFilter} onClear={clearFilters} />
       </div>
 
-      <DataTable
-        data={paged}
-        columns={columns}
-        rowKey={(sc) => sc.screening_id}
-        onRowClick={setSelectedScreening}
-        isLoading={isLoading}
-        sort={sort}
-        onSort={toggleSort}
-        page={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-        total={total}
-        caption="Security screening audit logs table"
-      />
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="lg:col-span-3">
+          <DataTable
+            data={paged}
+            columns={columns}
+            rowKey={(sc) => sc.screening_id}
+            onRowClick={setSelectedScreening}
+            isLoading={isLoading}
+            sort={sort}
+            onSort={toggleSort}
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            total={total}
+            caption="Security screening audit logs table"
+            rowClassName={(sc) => sc.is_flagged ? 'border-l-4 border-l-status-critical' : ''}
+          />
+        </div>
+        <div className="lg:col-span-1 h-[400px]">
+          <ChartWrapper title="Hourly Volume">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart 
+                data={Object.entries(augmentedScreenings.reduce((acc, sc) => {
+                  if (sc.screening_time) {
+                    const h = new Date(sc.screening_time).getHours();
+                    acc[h] = (acc[h] || 0) + 1;
+                  }
+                  return acc;
+                }, {} as Record<number, number>)).map(([hour, volume]) => ({ hour: `${hour}:00`, volume }))}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient id="colorVol" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={chartTheme.primary} stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor={chartTheme.primary} stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="hour" stroke={chartTheme.axis} />
+                <YAxis stroke={chartTheme.axis} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: chartTheme.tooltipBg, border: `1px solid ${chartTheme.grid}`, borderRadius: '4px', color: chartTheme.primary }}
+                  itemStyle={{ color: chartTheme.primary }}
+                  cursor={{ stroke: '#3A4F62', strokeWidth: 1, strokeDasharray: '4 4' }}
+                />
+                <Area type="monotone" dataKey="volume" stroke={chartTheme.primary} fillOpacity={1} fill="url(#colorVol)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartWrapper>
+        </div>
+      </div>
 
       <SecurityDetailPanel
         screening={selectedScreening}

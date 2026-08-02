@@ -31,45 +31,6 @@ export default function MaintenancePage() {
     }
   }, [params, raw.maintenanceLogs]);
 
-  const stats = useMemo(() => {
-    let aogCount = 0;
-    let unclearedCount = 0;
-    let sumDuration = 0;
-    let sumParts = 0;
-    let criticalIssuesCount = 0;
-    let engineWarningsCount = 0;
-    const techMap: Record<string, number> = {};
-
-    for (const m of maintenanceLogs) {
-      if (m.is_aog) aogCount++;
-      if (!m.cleared_to_fly) unclearedCount++;
-      if (m.severity_level >= 3) criticalIssuesCount++;
-      if (/engine|oil|hydr|leak|warning/i.test(m.defect_description || '')) engineWarningsCount++;
-      if (m.technician_id) techMap[m.technician_id] = (techMap[m.technician_id] || 0) + 1;
-      sumDuration += m.duration_hrs;
-      sumParts += m.parts_used_count;
-    }
-
-    const avgDuration = maintenanceLogs.length ? sumDuration / maintenanceLogs.length : 0;
-    const healthScore = maintenanceLogs.length ? ((maintenanceLogs.length - unclearedCount) / maintenanceLogs.length) * 100 : 100;
-    const topEngineers = Object.entries(techMap)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([id, count]) => ({ id, count }));
-
-    return {
-      total: maintenanceLogs.length,
-      aog: aogCount,
-      uncleared: unclearedCount,
-      avgDuration,
-      totalParts: sumParts,
-      criticalIssues: criticalIssuesCount,
-      engineWarnings: engineWarningsCount,
-      healthScore,
-      topEngineers,
-    };
-  }, [maintenanceLogs]);
-
   const filterDefs = useMemo(() => {
     const types = Array.from(new Set(maintenanceLogs.map((m) => m.maintenance_type)));
     const levels = Array.from(new Set(maintenanceLogs.map((m) => m.severity_level))).sort((a, b) => a - b);
@@ -127,7 +88,7 @@ export default function MaintenancePage() {
   };
 
   const {
-    filters, setFilter, clearFilters, sort, toggleSort, paged, page, setPage, totalPages, total,
+    filters, setFilter, clearFilters, sort, toggleSort, paged, page, setPage, totalPages, total, filtered
   } = useFilter<MaintenanceLog>({
     data: search ? raw.maintenanceLogs : maintenanceLogs,
     searchFields: [(m) => m.work_order_id, (m) => m.tail_number, (m) => m.flight_id, (m) => m.technician_id, (m) => m.supervisor_id],
@@ -137,6 +98,47 @@ export default function MaintenancePage() {
     searchQuery: search,
     setSearchQuery: setSearch,
   });
+
+  const stats = useMemo(() => {
+    let aogCount = 0;
+    let unclearedCount = 0;
+    let sumDuration = 0;
+    let sumParts = 0;
+    let criticalIssuesCount = 0;
+    let engineWarningsCount = 0;
+    const techMap: Record<string, number> = {};
+
+    for (const m of filtered) {
+      if (m.is_aog) aogCount++;
+      if (!m.cleared_to_fly) unclearedCount++;
+      if (m.severity_level >= 3) criticalIssuesCount++;
+      if (/engine|oil|hydr|leak|warning/i.test(m.defect_description || '')) engineWarningsCount++;
+      if (m.technician_id) techMap[m.technician_id] = (techMap[m.technician_id] || 0) + 1;
+      sumDuration += m.duration_hrs;
+      sumParts += m.parts_used_count;
+    }
+
+    const avgDuration = filtered.length ? sumDuration / filtered.length : 0;
+    const healthScore = filtered.length ? ((filtered.length - unclearedCount) / filtered.length) * 100 : 100;
+    const topEngineers = Object.entries(techMap)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([id, count]) => ({ id, count }));
+
+    return {
+      total: filtered.length,
+      aog: aogCount,
+      uncleared: unclearedCount,
+      avgDuration,
+      totalParts: sumParts,
+      criticalIssues: criticalIssuesCount,
+      engineWarnings: engineWarningsCount,
+      healthScore,
+      topEngineers,
+    };
+  }, [filtered]);
+
+
 
   const columns: ColumnDef<MaintenanceLog>[] = [
     {
@@ -190,7 +192,8 @@ export default function MaintenancePage() {
       key: 'status',
       header: 'Status',
       render: (m) => (
-        <div className="flex gap-1">
+        <div className="flex gap-1 flex-wrap">
+          <StatusBadge status={m.status} variant={m.status === 'Complete' ? 'ok' : m.status === 'In Progress' ? 'info' : 'warning'} />
           <StatusBadge status={m.cleared_to_fly ? 'Cleared' : 'Ground Hold'} variant={m.cleared_to_fly ? 'ok' : 'critical'} />
           {m.is_aog && <StatusBadge status="AOG" variant="critical" />}
         </div>

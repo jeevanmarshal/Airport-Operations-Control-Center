@@ -75,7 +75,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       (m) => m.start_time && m.start_time <= simulatedNow
     );
     const staffShifts = data.staffShifts.filter(
-      (s) => s.shift_start && s.shift_start <= simulatedNow
+      (s) => s.shift_date && s.shift_date <= simulatedNow
     );
     const retailTransactions = data.retailTransactions.filter(
       (r) => r.transaction_time && r.transaction_time <= simulatedNow

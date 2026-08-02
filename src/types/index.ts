@@ -137,6 +137,7 @@ export interface MaintenanceLog {
   is_aog: boolean;
   cleared_to_fly: boolean;
   notes: string | null;
+  status: string;
 }
 
 export interface StaffShift {
@@ -145,8 +146,7 @@ export interface StaffShift {
   department: string;
   role: string;
   shift_date: Date | null;
-  shift_start: Date | null;
-  shift_end: Date | null;
+  shift_hour: number;
   terminal: string;
   gate: string;
   supervisor_id: string;

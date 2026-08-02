@@ -16,16 +16,35 @@ function getStableColor(name: string) {
   return colorMap.get(name)!;
 }
 
+import { useData } from '@/context/DataContext';
+
 export default function DelayBreakdownChart({ flights }: { flights: Flight[] }) {
+  const { raw } = useData();
+
+  const allReasons = useMemo(() => {
+    const reasons = new Set<string>();
+    raw.flights.forEach(f => {
+      if (f.delay_reason && f.delay_minutes > 0) reasons.add(f.delay_reason);
+    });
+    const arr = Array.from(reasons).sort((a, b) => a.localeCompare(b));
+    if (arr.length === 0) arr.push('Unknown');
+    return arr;
+  }, [raw.flights]);
+
   const data = useMemo(() => {
     const delayed = flights.filter((f) => f.delay_minutes > 0);
     const counts = groupCount(delayed, (f) => f.delay_reason ?? 'Unknown');
-    return Object.entries(counts)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => a.name.localeCompare(b.name)); // Stable sort for smooth animation
-  }, [flights]);
+    
+    // Provide ALL possible reasons with a value (0 if not present) to ensure 
+    // constant array length for smooth Recharts Pie animations.
+    return allReasons.map(name => ({
+      name,
+      value: counts[name] || 0
+    }));
+  }, [flights, allReasons]);
 
-  if (data.length === 0) {
+  const totalValue = data.reduce((sum, item) => sum + item.value, 0);
+  if (totalValue === 0) {
     return <div className="flex h-full items-center justify-center text-[13px] text-text-secondary">No delayed flights to break down.</div>;
   }
 

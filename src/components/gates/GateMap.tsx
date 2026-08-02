@@ -18,6 +18,14 @@ interface Props {
  * gate-event drill-down still surfaces the true underlying event records.
  */
 export default function GateMap({ flights, gateEvents, selectedGate, onSelectGate }: Props) {
+  const flightToGate = useMemo(() => {
+    const map: Record<string, string> = {};
+    flights.forEach((f) => {
+      map[f.flight_id] = f.gate;
+    });
+    return map;
+  }, [flights]);
+
   const flightsByGate = useMemo(() => {
     const map: Record<string, Flight[]> = {};
     flights.forEach((f) => {
@@ -29,9 +37,12 @@ export default function GateMap({ flights, gateEvents, selectedGate, onSelectGat
 
   const eventsByGate = useMemo(() => {
     const map: Record<string, number> = {};
-    gateEvents.forEach((g) => { map[g.gate] = (map[g.gate] || 0) + 1; });
+    gateEvents.forEach((g) => { 
+      const targetGate = (g.flight_id && flightToGate[g.flight_id]) ? flightToGate[g.flight_id] : g.gate;
+      map[targetGate] = (map[targetGate] || 0) + 1; 
+    });
     return map;
-  }, [gateEvents]);
+  }, [gateEvents, flightToGate]);
 
   return (
     <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 lg:grid-cols-10 xl:grid-cols-5" role="grid" aria-label="Terminal 3 gate map, gates B1 through B50">

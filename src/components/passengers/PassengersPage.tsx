@@ -25,10 +25,20 @@ export default function PassengersPage() {
   useEffect(() => {
     const q = params.get('search');
     if (q && raw.passengers.length) {
-      const match = raw.passengers.find((p) => p.passenger_id === q || p.pnr_code === q);
+      let match = raw.passengers.find((p) => p.passenger_id === q || p.pnr_code === q);
+      if (!match) {
+        // Cross-query other datasets by PNR/ID
+        const sec = raw.securityScreenings.find(s => s.screening_id === q || s.pnr_code === q || s.passenger_id === q);
+        const bag = raw.baggage.find(b => b.bag_tag === q || b.pnr_code === q || b.passenger_id === q);
+        const ret = raw.retailTransactions.find(r => r.transaction_id === q || r.pnr_code === q);
+        const pnr = sec?.pnr_code || bag?.pnr_code || ret?.pnr_code;
+        if (pnr) {
+          match = raw.passengers.find(p => p.pnr_code === pnr);
+        }
+      }
       if (match) setSelectedPassenger(match);
     }
-  }, [params, raw.passengers]);
+  }, [params, raw.passengers, raw.securityScreenings, raw.baggage, raw.retailTransactions]);
 
   const stats = useMemo(() => {
     let bizCount = 0;

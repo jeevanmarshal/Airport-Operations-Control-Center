@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowUp, ArrowDown, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import EmptyState from './EmptyState';
 import LoadingState from './LoadingState';
 
@@ -24,13 +24,25 @@ interface DataTableProps<T> {
   onPageChange?: (p: number) => void;
   total?: number;
   caption: string;
+  rowClassName?: (row: T) => string;
+  renderExpandedRow?: (row: T) => React.ReactNode;
 }
 
 export default function DataTable<T>({
-  data, columns, onRowClick, rowKey, isLoading, sort, onSort, page = 1, totalPages = 1, onPageChange, total, caption,
+  data, columns, onRowClick, rowKey, isLoading, sort, onSort, page = 1, totalPages = 1, onPageChange, total, caption, rowClassName, renderExpandedRow
 }: DataTableProps<T>) {
+  const [expanded, setExpanded] = React.useState<Set<string>>(new Set());
+
   if (isLoading) return <LoadingState rows={10} />;
   if (data.length === 0) return <EmptyState message="No records match the current filters." />;
+
+  const toggleExpand = (rk: string) => {
+    setExpanded(prev => {
+      const next = new Set(prev);
+      if (next.has(rk)) next.delete(rk); else next.add(rk);
+      return next;
+    });
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -39,6 +51,7 @@ export default function DataTable<T>({
           <caption className="sr-only">{caption}</caption>
           <thead className="sticky top-0 z-10 bg-bg-elevated shadow-sm backdrop-blur-md bg-opacity-90">
             <tr>
+              {renderExpandedRow && <th scope="col" className="w-8 border-b border-border px-2"></th>}
               {columns.map((col) => (
                 <th
                   key={col.key}
@@ -58,22 +71,43 @@ export default function DataTable<T>({
               ))}
             </tr>
           </thead>
-          <tbody>
-            {data.map((row, i) => (
-              <tr
-                key={rowKey(row)}
-                onClick={onRowClick ? () => onRowClick(row) : undefined}
-                className={`group border-b border-border/40 transition-all duration-200 ${i % 2 === 1 ? 'bg-bg-card/30' : 'bg-transparent'} ${onRowClick ? 'cursor-pointer hover:bg-bg-elevated hover:shadow-[inset_2px_0_0_0_#00d4ff] hover:bg-opacity-80' : ''}`}
-                tabIndex={onRowClick ? 0 : undefined}
-                onKeyDown={onRowClick ? (e) => { if (e.key === 'Enter') onRowClick(row); } : undefined}
-              >
-                {columns.map((col) => (
-                  <td key={col.key} className={`px-4 py-2.5 align-middle text-text-primary transition-colors group-hover:text-white ${col.className ?? ''}`}>
-                    {col.render(row)}
-                  </td>
-                ))}
-              </tr>
-            ))}
+          <tbody className="divide-y divide-border bg-bg-card">
+            {data.map((row, i) => {
+              const rk = rowKey(row);
+              const customClass = rowClassName ? rowClassName(row) : '';
+              const isExpanded = expanded.has(rk);
+              return (
+                <React.Fragment key={rk}>
+                  <tr
+                    onClick={() => {
+                      if (renderExpandedRow) toggleExpand(rk);
+                      if (onRowClick) onRowClick(row);
+                    }}
+                    className={`group border-b border-border/40 transition-all duration-200 ${i % 2 === 1 ? 'bg-bg-card/30' : 'bg-transparent'} ${(onRowClick || renderExpandedRow) ? 'cursor-pointer hover:bg-bg-elevated hover:shadow-[inset_2px_0_0_0_#00d4ff] hover:bg-opacity-80' : ''} ${customClass}`}
+                    tabIndex={(onRowClick || renderExpandedRow) ? 0 : undefined}
+                    onKeyDown={(onRowClick || renderExpandedRow) ? (e) => { if (e.key === 'Enter') { if (renderExpandedRow) toggleExpand(rk); if (onRowClick) onRowClick(row); } } : undefined}
+                  >
+                    {renderExpandedRow && (
+                      <td className="px-2 py-2.5 text-center text-text-secondary">
+                        {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                      </td>
+                    )}
+                    {columns.map((col) => (
+                      <td key={col.key} className={`px-4 py-2.5 align-middle text-text-primary transition-colors group-hover:text-white ${col.className ?? ''}`}>
+                        {col.render(row)}
+                      </td>
+                    ))}
+                  </tr>
+                  {isExpanded && renderExpandedRow && (
+                    <tr className="bg-bg-elevated/50">
+                      <td colSpan={columns.length + 1} className="p-0">
+                        {renderExpandedRow(row)}
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              );
+            })}
           </tbody>
         </table>
       </div>

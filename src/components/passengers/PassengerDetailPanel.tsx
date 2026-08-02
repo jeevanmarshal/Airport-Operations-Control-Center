@@ -35,6 +35,60 @@ export default function PassengerDetailPanel({
   const { flight, baggage, security } = linked;
   const isUpgraded = passenger.cabin_class !== passenger.booked_class || passenger.is_upgrade;
 
+  const retail = data.retailTransactions.filter((r) => r.pnr_code === passenger.pnr_code);
+
+  const steps = [
+    {
+      id: 'booking',
+      title: 'Booking Confirmed',
+      status: 'ok',
+      time: passenger.boarding_time ? new Date(passenger.boarding_time.getTime() - 48*3600*1000) : null,
+      desc: `${flight?.airline_name || 'Unknown Airline'} • PNR: ${passenger.pnr_code} • ${passenger.cabin_class}`,
+    },
+    {
+      id: 'checkin',
+      title: 'Check-In',
+      status: passenger.check_in_time ? 'ok' : 'pending',
+      time: passenger.check_in_time,
+      desc: passenger.check_in_time ? `Seat ${passenger.seat_number}` : 'Not checked in yet',
+    },
+    {
+      id: 'baggage',
+      title: 'Baggage Drop',
+      status: baggage.length > 0 ? 'ok' : 'pending',
+      time: baggage.length > 0 ? baggage[0].timestamp : null,
+      desc: baggage.length > 0 ? `${baggage.length} bags checked (${baggage.reduce((acc,b)=>acc+b.weight_kg,0).toFixed(1)}kg)` : 'No checked bags',
+    },
+    {
+      id: 'security',
+      title: 'Security Screening',
+      status: security.length > 0 ? (security.some(s => s.result === 'Clear') ? 'ok' : 'critical') : 'pending',
+      time: security.length > 0 ? security[0].screening_time : null,
+      desc: security.length > 0 ? `Lane ${security[0].lane_number} • Result: ${security[0].result}` : 'Not cleared',
+    },
+    {
+      id: 'retail',
+      title: 'Retail & Duty Free',
+      status: retail.length > 0 ? 'info' : 'pending',
+      time: retail.length > 0 ? retail[0].transaction_time : null,
+      desc: retail.length > 0 ? `${retail.length} transactions (Latest: ${retail[0].store_type})` : 'No purchases',
+    },
+    {
+      id: 'boarding',
+      title: 'Boarding',
+      status: passenger.boarding_time ? 'ok' : 'pending',
+      time: passenger.boarding_time,
+      desc: passenger.boarding_time ? `Gate ${passenger.gate}` : 'Not boarded yet',
+    },
+  ];
+
+  const statusColors: Record<string, string> = {
+    'ok': 'border-status-ok bg-status-ok/10',
+    'critical': 'border-status-critical bg-status-critical/10',
+    'info': 'border-accent-primary bg-accent-primary/10',
+    'pending': 'border-border bg-bg-card opacity-50',
+  };
+
   return (
     <DetailPanel isOpen={!!passenger} onClose={onClose} title={`Passenger: ${passenger.first_name} ${passenger.last_name}`}>
       {/* Sticky Header info */}
@@ -78,55 +132,20 @@ export default function PassengerDetailPanel({
           <DetailField label="Phone" value={passenger.phone} />
         </DetailSection>
 
-        <DetailSection title="Journey Details">
-          {flight && <DetailField label="Airline" value={flight.airline_name} />}
-          <DetailField label="PNR Code" value={passenger.pnr_code} className="font-data" />
-          <DetailField label="Check-In Time" value={formatDateTime(passenger.check_in_time)} />
-          <DetailField label="Boarding Time" value={formatDateTime(passenger.boarding_time)} />
-          <DetailField label="Boarding Gate" value={passenger.gate} className="font-data" />
-        </DetailSection>
-
-        <DetailSection title={`Linked Baggage (${baggage.length})`}>
-          {baggage.length === 0 ? (
-            <p className="text-[12px] text-text-secondary">No baggage records linked to PNR.</p>
-          ) : (
-            <div className="flex flex-col gap-1.5 mt-2">
-              {baggage.map((b) => (
-                <div key={b.bag_tag} className="rounded border border-border bg-bg-elevated px-2 py-1 text-[12px] flex justify-between items-center">
-                  <div>
-                    <span className="font-data font-semibold text-accent-primary cursor-pointer hover:underline" onClick={() => onSelectBag?.(b.bag_tag)}>{b.bag_tag}</span>
-                    <span className="text-text-secondary"> · {b.status}</span>
+        <DetailSection title="Passenger Journey Timeline">
+          <div className="flex flex-col gap-3 mt-2">
+            {steps.map((step, i) => (
+              <div key={step.id} className={`flex items-start rounded-md border-l-4 p-3 ${statusColors[step.status]} transition-all`}>
+                <div className="flex-1">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[13px] font-bold text-text-primary">{i + 1}. {step.title}</span>
+                    <span className="text-[11px] font-data text-text-secondary">{formatDateTime(step.time) || '--'}</span>
                   </div>
-                  <span className="font-data text-text-secondary">{b.weight_kg.toFixed(1)} kg</span>
+                  <span className="text-[11px] text-text-secondary">{step.desc}</span>
                 </div>
-              ))}
-            </div>
-          )}
-        </DetailSection>
-
-        <DetailSection title={`Security Screening (${security.length})`}>
-          {security.length === 0 ? (
-            <p className="text-[12px] text-text-secondary">No security screenings recorded.</p>
-          ) : (
-            <div className="flex flex-col gap-1.5 mt-2">
-              {security.map((s) => (
-                <div key={s.screening_id} className="rounded border border-border bg-bg-elevated px-2 py-1.5 text-[12px]">
-                  <div className="flex justify-between items-center">
-                    <span className="font-data font-semibold">{s.screening_id} (Lane {s.lane_number})</span>
-                    <StatusBadge status={s.result} variant={s.result === 'Clear' ? 'ok' : 'critical'} />
-                  </div>
-                  <div className="text-text-secondary mt-1">
-                    Time: {formatDateTime(s.screening_time)} · duration: {s.processing_seconds}s
-                  </div>
-                  {s.is_flagged && (
-                    <div className="text-status-critical mt-1 text-[11px] font-semibold">
-                      Flagged: {s.flag_reason || 'Reason not specified'}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
         </DetailSection>
       </div>
     </DetailPanel>

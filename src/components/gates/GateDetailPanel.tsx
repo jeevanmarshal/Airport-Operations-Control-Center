@@ -11,10 +11,20 @@ export default function GateDetailPanel({ gate, onClose }: { gate: string | null
 
   const info = useMemo(() => {
     if (!gate) return null;
-    const events = data.gateEvents.filter((e) => e.gate === gate);
+    
+    // Find all flights actually assigned to this gate
     const flights = data.flights.filter((f) => f.gate === gate);
+    const flightIdsAtGate = new Set(flights.map((f) => f.flight_id));
+
+    // Include events that match the gate directly OR are linked to a flight at this gate
+    const events = data.gateEvents.filter((e) => e.gate === gate || (e.flight_id && flightIdsAtGate.has(e.flight_id)));
+
+    // Extract staff IDs from those events to find staff handling those events
     const staffIds = new Set(events.map((e) => e.staff_id));
-    const staff = data.staffShifts.filter((s) => staffIds.has(s.staff_id));
+    
+    // Include staff whose shift gate matches directly OR who are involved in an event at this gate
+    const staff = data.staffShifts.filter((s) => s.gate === gate || staffIds.has(s.staff_id));
+    
     return { events, flights, staff };
   }, [data, gate]);
 
