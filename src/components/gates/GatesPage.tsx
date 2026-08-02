@@ -49,33 +49,29 @@ export default function GatesPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 items-start">
-        <div className="xl:col-span-2">
-          <section aria-label="Gate map, Terminal 3, gates B1 through B50" className="rounded-lg border border-border bg-bg-card p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-[20px] font-semibold text-text-primary">Gate Map — Terminal 3</h2>
-              {selectedGate && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedGate(null)}
-                  className="text-[12px] text-accent-primary hover:underline"
-                >
-                  Clear gate filter ({selectedGate})
-                </button>
-              )}
-            </div>
-            <GateMap flights={flights} gateEvents={gateEvents} selectedGate={selectedGate} onSelectGate={setSelectedGate} />
-          </section>
-        </div>
+      <div className="flex flex-col gap-5 items-stretch">
+        <section aria-label="Gate map, Terminal 3, gates B1 through B50" className="rounded-lg border border-border bg-bg-card p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-[20px] font-semibold text-text-primary">Gate Map — Terminal 3</h2>
+            {selectedGate && (
+              <button
+                type="button"
+                onClick={() => setSelectedGate(null)}
+                className="text-[12px] text-accent-primary hover:underline"
+              >
+                Clear gate filter ({selectedGate})
+              </button>
+            )}
+          </div>
+          <GateMap flights={flights} gateEvents={gateEvents} selectedGate={selectedGate} onSelectGate={setSelectedGate} />
+        </section>
 
-        <div className="xl:col-span-1">
-          <section aria-label="Gate events" className="rounded-lg border border-border bg-bg-card p-4">
-            <h2 className="mb-3 text-[20px] font-semibold text-text-primary">
-              Gate Event Log {selectedGate ? `— Gate ${selectedGate}` : ''}
-            </h2>
-            <GateEventList events={gateEvents} isLoading={isLoading} onRowClick={handleEventClick} gateFilter={selectedGate} />
-          </section>
-        </div>
+        <section aria-label="Gate events" className="rounded-lg border border-border bg-bg-card p-4">
+          <h2 className="mb-3 text-[20px] font-semibold text-text-primary">
+            Gate Event Log {selectedGate ? `— Gate ${selectedGate}` : ''}
+          </h2>
+          <GateEventList events={gateEvents} isLoading={isLoading} onRowClick={handleEventClick} gateFilter={selectedGate} />
+        </section>
       </div>
 
       <GateDetailPanel gate={selectedGate} onClose={() => setSelectedGate(null)} />
