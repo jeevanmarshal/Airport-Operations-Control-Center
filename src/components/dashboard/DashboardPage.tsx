@@ -23,7 +23,7 @@ export default function DashboardPage() {
   }, [alerts]);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       <h1 className="text-[28px] font-semibold text-text-primary">Operations Dashboard</h1>
 
       <section aria-label="Airport-wide KPIs" className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">

@@ -50,9 +50,9 @@ export default function KPICard({ label, value, unit, icon: Icon, statusColor = 
         <span className="text-[11px] font-medium uppercase tracking-wider text-text-secondary">{label}</span>
         {Icon && <Icon size={18} className="text-text-secondary" aria-hidden="true" />}
       </div>
-      <div className="mt-2 font-data text-[18px] xs:text-[22px] sm:text-[26px] md:text-[32px] font-bold leading-none text-text-primary overflow-hidden text-ellipsis whitespace-nowrap">
+      <div className="mt-2 font-data text-[18px] xs:text-[20px] sm:text-[24px] md:text-[28px] font-bold leading-none text-text-primary overflow-hidden text-ellipsis whitespace-nowrap">
         {isNumeric ? new Intl.NumberFormat('en-IN', { maximumFractionDigits: decimals, minimumFractionDigits: decimals }).format(Number(animated)) : value}
-        {unit && <span className="ml-1 text-xs sm:text-sm md:text-base font-medium text-text-secondary">{unit}</span>}
+        {unit && <span className="ml-1 text-xs sm:text-sm font-medium text-text-secondary">{unit}</span>}
       </div>
       {subtext && <div className="mt-1 text-[13px] text-text-secondary">{subtext}</div>}
     </div>

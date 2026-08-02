@@ -58,7 +58,7 @@ export default function GateEventList({ events, isLoading, onRowClick, gateFilte
       terminal: (e, v) => e.terminal === v,
       is_delayed: (e, v) => String(e.is_delayed) === v,
     },
-    pageSize: 50,
+    pageSize: 10,
   });
 
   return (
