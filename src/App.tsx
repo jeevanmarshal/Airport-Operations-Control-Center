@@ -1,4 +1,5 @@
 import { BrowserRouter } from 'react-router-dom';
+import AOCCLogo from '@/components/common/AOCCLogo';
 import { DataProvider, useData } from '@/context/DataContext';
 import { SimulationProvider } from '@/context/SimulationContext';
 import { AlertProvider } from '@/context/AlertContext';
@@ -18,9 +19,14 @@ function Gate({ children }: { children: React.ReactNode }) {
   }
   if (isLoading) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center gap-4 bg-bg-primary p-6">
-        <div className="font-data text-[13px] text-accent-primary">LOADING AIRPORT OPERATIONS DATASET…</div>
-        <div className="w-72"><LoadingState rows={5} /></div>
+      <div className="flex h-screen flex-col items-center justify-center gap-8 bg-bg-primary p-6">
+        <AOCCLogo className="w-24 h-24 animate-pulse-slow" />
+        <div className="flex flex-col items-center gap-4">
+          <div className="font-data text-[13px] text-accent-primary uppercase tracking-[0.2em] font-semibold">
+            INITIALIZING AOCC DATASET…
+          </div>
+          <div className="w-72"><LoadingState rows={3} /></div>
+        </div>
       </div>
     );
   }

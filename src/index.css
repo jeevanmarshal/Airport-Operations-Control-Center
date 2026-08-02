@@ -53,3 +53,31 @@ body {
 table { border-collapse: separate; border-spacing: 0; }
 
 .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+
+/* Custom Animations */
+@keyframes fadeInSlide {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseUpdate {
+  0% { background-color: rgba(0, 212, 255, 0.15); box-shadow: 0 0 8px rgba(0, 212, 255, 0.2); }
+  100% { background-color: transparent; box-shadow: none; }
+}
+
+@keyframes softBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-fade-in {
+  animation: fadeInSlide 250ms ease-out forwards;
+}
+
+.animate-pulse-update {
+  animation: pulseUpdate 800ms ease-out forwards;
+}
+
+.animate-soft-blink {
+  animation: softBlink 2s ease-in-out infinite;
+}

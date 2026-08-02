@@ -17,45 +17,6 @@ export default function RetailPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
 
-  // Stats
-  const stats = useMemo(() => {
-    let totalRevenue = 0;
-    let dutyFreeCount = 0;
-
-    for (const t of retailTransactions) {
-      totalRevenue += t.total_amount_inr;
-      if (t.is_duty_free) dutyFreeCount++;
-    }
-
-    const avgValue = retailTransactions.length ? totalRevenue / retailTransactions.length : 0;
-
-    return {
-      total: retailTransactions.length,
-      revenue: totalRevenue,
-      avgVal: avgValue,
-      dutyFree: dutyFreeCount,
-    };
-  }, [retailTransactions]);
-
-  // Hourly volume chart aggregation
-  const hourlyData = useMemo(() => {
-    const hours = Array.from({ length: 24 }, (_, i) => ({
-      hour: `${String(i).padStart(2, '0')}:00`,
-      transactions: 0,
-      revenue: 0,
-    }));
-
-    for (const t of retailTransactions) {
-      if (t.transaction_time) {
-        const hour = new Date(t.transaction_time).getHours();
-        hours[hour].transactions++;
-        hours[hour].revenue += t.total_amount_inr;
-      }
-    }
-
-    return hours;
-  }, [retailTransactions]);
-
   // Filters
   const filterDefs = useMemo(() => {
     const storeTypes = Array.from(new Set(retailTransactions.map((t) => t.store_type)));
@@ -109,7 +70,7 @@ export default function RetailPage() {
   };
 
   const {
-    filters, setFilter, clearFilters, sort, toggleSort, paged, page, setPage, totalPages, total,
+    filters, setFilter, clearFilters, sort, toggleSort, paged, page, setPage, totalPages, total, filtered
   } = useFilter<RetailTransaction>({
     data: search ? raw.retailTransactions : retailTransactions,
     searchFields: [(t) => t.transaction_id, (t) => t.pnr_code, (t) => t.flight_id, (t) => t.staff_id],
@@ -119,6 +80,47 @@ export default function RetailPage() {
     searchQuery: search,
     setSearchQuery: setSearch,
   });
+
+  // Stats
+  const stats = useMemo(() => {
+    let totalRevenue = 0;
+    let dutyFreeCount = 0;
+
+    for (const t of filtered) {
+      totalRevenue += t.total_amount_inr;
+      if (t.is_duty_free) dutyFreeCount++;
+    }
+
+    const avgValue = filtered.length ? totalRevenue / filtered.length : 0;
+
+    return {
+      total: filtered.length,
+      revenue: totalRevenue,
+      avgVal: avgValue,
+      dutyFree: dutyFreeCount,
+    };
+  }, [filtered]);
+
+  // Hourly volume chart aggregation
+  const hourlyData = useMemo(() => {
+    const hours = Array.from({ length: 24 }, (_, i) => ({
+      hour: `${String(i).padStart(2, '0')}:00`,
+      transactions: 0,
+      revenue: 0,
+    }));
+
+    for (const t of filtered) {
+      if (t.transaction_time) {
+        const hour = new Date(t.transaction_time).getHours();
+        hours[hour].transactions++;
+        hours[hour].revenue += t.total_amount_inr;
+      }
+    }
+
+    return hours;
+  }, [filtered]);
+
+
 
   const columns: ColumnDef<RetailTransaction>[] = [
     {

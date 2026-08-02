@@ -1,10 +1,10 @@
 import React from 'react';
 
-export default function ChartWrapper({ title, children, height = 260 }: { title: string; children: React.ReactNode; height?: number }) {
+export default function ChartWrapper({ title, children, height = 260 }: { title: string; children: React.ReactNode; height?: number | string }) {
   return (
-    <div className="rounded-lg border border-border bg-bg-card p-4">
-      <h3 className="mb-3 text-[16px] font-semibold text-text-primary">{title}</h3>
-      <div style={{ height }}>{children}</div>
+    <div className="rounded-lg border border-border bg-bg-card p-4 flex flex-col h-full">
+      <h3 className="mb-3 text-[16px] font-semibold text-text-primary shrink-0">{title}</h3>
+      <div className="flex-1 min-h-0" style={height ? { minHeight: height } : undefined}>{children}</div>
     </div>
   );
 }

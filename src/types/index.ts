@@ -207,4 +207,4 @@ export interface AllData {
   retailTransactions: RetailTransaction[];
 }
 
-export type SimSpeed = 1 | 5 | 10 | 20;
+export type SimSpeed = 1 | 10 | 20 | 40 | 80;

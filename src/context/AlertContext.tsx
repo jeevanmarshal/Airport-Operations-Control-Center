@@ -41,10 +41,7 @@ export function AlertProvider({ children }: { children: React.ReactNode }) {
         const sig = `${existing.module}-${existing.recordId}-${existing.severity}-${existing.message}`;
 
         if (activeSignatures.has(sig)) {
-          // If the condition is still active but was marked resolved, revive it
-          if (existing.status === 'Resolved' || existing.status === 'Closed') {
-            return { ...existing, status: 'Created' as const, resolvedAt: undefined, acknowledged: false };
-          }
+          // If the condition is still active but was marked closed, keep it closed so a new one can spawn
           return existing;
         } else {
           // Condition has disappeared -> AUTO-RESOLUTION!

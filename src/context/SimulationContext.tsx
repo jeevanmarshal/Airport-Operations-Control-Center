@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import type { SimSpeed } from '@/types';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 export const SIMULATION_START = new Date('2024-10-15T08:00:00');
 export const SIMULATION_END = new Date('2024-12-30T23:59:59');
@@ -15,7 +16,7 @@ interface SimulationContextType {
 
 const SimulationContext = createContext<SimulationContextType>({
   simulatedNow: SIMULATION_START,
-  speed: 1,
+  speed: 20,
   setSpeed: () => {},
   isRunning: true,
   toggleSimulation: () => {},
@@ -23,8 +24,8 @@ const SimulationContext = createContext<SimulationContextType>({
 
 export function SimulationProvider({ children }: { children: React.ReactNode }) {
   const [simulatedNow, setSimulatedNow] = useState<Date>(SIMULATION_START);
-  const [speed, setSpeed] = useState<SimSpeed>(1);
-  const [isRunning, setIsRunning] = useState(true);
+  const [speed, setSpeed] = useLocalStorage<SimSpeed>('sim_speed', 20);
+  const [isRunning, setIsRunning] = useLocalStorage<boolean>('sim_running', true);
   const speedRef = useRef(speed);
   const runningRef = useRef(isRunning);
   speedRef.current = speed;

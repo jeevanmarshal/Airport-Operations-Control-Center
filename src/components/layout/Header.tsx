@@ -1,4 +1,5 @@
-import { PlaneTakeoff, Bell, Menu } from 'lucide-react';
+import AOCCLogo from '@/components/common/AOCCLogo';
+import { Bell, Menu } from 'lucide-react';
 import { useSimulation } from '@/context/SimulationContext';
 import { useAlerts } from '@/context/AlertContext';
 import { formatSimClock } from '@/utils/formatters';
@@ -17,28 +18,34 @@ export default function Header({ onToggleSidebar }: { onToggleSidebar?: () => vo
     : 'text-status-ok border-status-ok/40 bg-status-ok/10 shadow-glow-ok';
 
   return (
-    <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-bg-card px-3 sm:px-4 md:px-6">
-      <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+    <header className="flex h-[72px] shrink-0 items-center justify-between border-b border-border bg-bg-card px-3 sm:px-4 md:px-6">
+      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
         <button
           type="button"
           onClick={onToggleSidebar}
           className="rounded p-1.5 text-text-secondary hover:bg-bg-elevated hover:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent-primary lg:hidden shrink-0"
           aria-label="Toggle navigation menu"
         >
-          <Menu size={18} />
+          <Menu size={20} />
         </button>
-        <PlaneTakeoff size={20} className="text-accent-primary shrink-0" aria-hidden="true" />
-        <div className="leading-tight min-w-0">
-          <div className="text-[13px] sm:text-[16px] font-semibold text-text-primary">
-            <span className="xs:hidden">DEL — IGI Airport</span>
-            <span className="hidden xs:inline sm:hidden">DEL — Indira Gandhi Intl</span>
-            <span className="hidden sm:inline">DEL — Indira Gandhi International</span>
+        
+        <AOCCLogo className="h-10 w-10 sm:h-12 sm:w-12 shrink-0" />
+        
+        <div className="flex flex-col min-w-0 justify-center pb-0.5">
+          <div className="flex items-baseline gap-2 sm:gap-3 mb-0.5">
+            <span className="text-[22px] sm:text-[24px] md:text-[26px] font-bold text-text-primary leading-none tracking-tight">DEL</span>
+            <span className="hidden sm:block text-[14px] md:text-[16px] font-semibold text-text-primary leading-none">Indira Gandhi International Airport</span>
           </div>
-          <div className="text-[9px] sm:text-[11px] uppercase tracking-wide text-text-secondary">
-            <span className="xs:hidden">T3 · AOCC</span>
-            <span className="hidden xs:inline sm:hidden">Terminal 3 · AOCC</span>
-            <span className="hidden sm:inline">Terminal 3 · Operations Control Center</span>
-          </div>
+          
+          <span className="hidden md:block text-[11px] font-semibold uppercase tracking-[0.12em] text-text-secondary opacity-70 mt-1">
+            Terminal 3 • Airport Operations Control Center
+          </span>
+          <span className="hidden xs:block md:hidden text-[11px] font-semibold uppercase tracking-wider text-text-secondary opacity-80 mt-0.5">
+            Terminal 3 • AOCC
+          </span>
+          <span className="xs:hidden text-[11px] font-semibold uppercase tracking-wider text-text-secondary opacity-80 mt-0.5">
+            Airport Operations
+          </span>
         </div>
       </div>
 

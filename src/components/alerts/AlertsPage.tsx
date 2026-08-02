@@ -259,11 +259,11 @@ export default function AlertsPage() {
     {
       key: 'actions',
       header: 'Operations',
-      className: 'text-right',
+      className: 'text-center',
       render: (a) => {
         const status = a.status || 'Created';
         return (
-          <div className="flex justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+          <div className="flex justify-center gap-1.5" onClick={(e) => e.stopPropagation()}>
             {status === 'Created' && (
               <>
                 <button

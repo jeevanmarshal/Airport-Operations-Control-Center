@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 interface DetailPanelProps {
@@ -39,30 +40,33 @@ export default function DetailPanel({ isOpen, onClose, title, children }: Detail
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-40" role="presentation">
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} aria-hidden="true" />
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" role="presentation">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
         tabIndex={-1}
-        className="absolute right-0 top-0 h-full w-full sm:w-[70vw] lg:w-[450px] animate-slide-in-right overflow-y-auto border-l border-border bg-bg-card p-5 shadow-2xl scrollbar-thin focus:outline-none"
+        className="relative flex flex-col w-full sm:w-[80vw] lg:w-[600px] max-h-[90vh] animate-fade-in overflow-hidden rounded-xl border border-border bg-bg-card shadow-2xl focus:outline-none"
       >
-        <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
+        <div className="flex-shrink-0 flex items-center justify-between border-b border-border bg-bg-elevated/50 p-4">
           <h2 className="text-[20px] font-semibold text-text-primary">{title}</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close panel"
-            className="flex h-9 w-9 items-center justify-center rounded-md text-text-secondary hover:bg-bg-elevated hover:text-accent-primary"
+            className="flex h-9 w-9 items-center justify-center rounded-md text-text-secondary hover:bg-bg-elevated hover:text-accent-primary transition-colors"
           >
             <X size={18} />
           </button>
         </div>
-        {children}
+        <div className="flex-1 overflow-y-auto p-5 scrollbar-thin">
+          {children}
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

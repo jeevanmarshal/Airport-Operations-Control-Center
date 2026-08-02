@@ -1,128 +1,162 @@
-# Indira Gandhi International Airport (DEL) — Terminal T3
-## Airport Operations Control Center (AOCC) — Hackathon Finalist Submission
+# DEL Airport Operations Control Center (AOCC)
+Indira Gandhi International Airport
+Terminal 3 Operations Dashboard
 
-A production-quality, real-time Airport Operations Control Center (AOCC) web application that aggregates DEL Terminal T3 operational data (October 1, 2024 to December 30, 2024) across flights, baggage, passengers, security screening, maintenance, staff, and retail sales. The application provides unified operations tracking, interactive data visualization, dynamic real-time simulations, and exception handling alert tickers.
+The DEL Airport Operations Control Center (AOCC) is a comprehensive, simulated, single-pane-of-glass dashboard designed for enterprise airport management. It visualizes operational data across multiple distinct modules, allowing operations staff to monitor, investigate, and resolve issues in real-time.
 
----
+## Overview
 
-## 🚀 Getting Started
+The AOCC application addresses the fragmentation of information in airport operations by aggregating data from various departments—flights, baggage, security, maintenance, and retail—into one unified platform. 
+The system operates on a live-simulated operational dataset running from October 15, 2024, to December 30, 2024. The built-in simulation engine mimics real-time updates and automatically surfaces anomalies as alerts. Operations staff can navigate through specialized modules to investigate delays, manage bottlenecks, and ensure smooth terminal operations.
 
-### Prerequisites
-Make sure you have **Node.js (v18+)** and **npm** installed on your system.
+## Features
 
-### Installation
-1. Clone the repository or open the project folder.
-2. Run the following command to install dependencies:
-   ```bash
-   npm install
-   ```
+### Dashboard
+Provides a high-level executive summary of terminal operations, presenting key performance indicators (KPIs) for active flights, passenger throughput, security queue wait times, and unresolved critical alerts. 
 
-### Running Locally
-To launch the developer mode server (hot-reloaded, port 3000):
-```bash
-npm run dev
-```
+### Flights
+Tracks real-time flight statuses, expected arrival and departure times, gate assignments, and delay metrics. Interactive data tables support sorting, searching, and filtering to isolate delayed or specific carrier flights.
 
-### Production Build
-To run TypeScript compiler checks and bundle the application into optimized static assets under the `dist/` directory:
-```bash
-npm run build
-```
-To preview the production build locally:
-```bash
-npm run preview
-```
+### Gate Operations
+Monitors gate utilization across Terminal 3 (Gates B1 through B50). Includes a visual gate map indicating occupancy and statuses, alongside an event log tracking aircraft docking, cleaning, and maintenance holds.
 
----
+### Baggage
+Monitors baggage handling performance, tracking transfer counts, oversize baggage processing, and potential handling delays or damages.
 
-## 📁 Folder Structure
+### Passenger Management
+Visualizes passenger flow and satisfaction metrics. Provides demographics, frequent flyer statistics, and booking class distributions to optimize terminal resource allocation.
 
-The project has been organized into a clean, modular structure:
+### Security
+Tracks security lane throughput and peak hour efficiency. Identifies anomalies, flagged passengers, and processing bottlenecks across different screening zones.
+
+### Maintenance
+Logs aircraft and terminal maintenance work orders. Highlights Aircraft on Ground (AOG) situations, technician assignments, and repair durations.
+
+### Staff
+Monitors staff shifts, department allocations, and certification expirations. Ensures adequate coverage for peak operational hours.
+
+### Retail
+Tracks commercial performance across terminal retail zones. Analyzes transaction volumes, duty-free sales, and revenue generation metrics.
+
+### Alert Center
+A centralized incident management system. Automatically generates alerts based on simulation anomalies (e.g., flight delays, critical maintenance). Supports a full acknowledgment and resolution lifecycle.
+
+### Simulation Engine
+A real-time state machine that progresses time through a statically loaded dataset. Includes playback controls (Pause, 1x, 10x, 20x, 40x, 80x) to observe historical operations at varying speeds.
+
+### Responsive Design
+Features a fully responsive layout with collapsible sidebar navigation, scalable UI elements, and horizontal-scrolling data tables, ensuring usability across desktop, tablet, and mobile form factors.
+
+## Technology Stack
+
+- **Framework:** React 18, TypeScript, Vite
+- **Styling:** Tailwind CSS
+- **Routing:** React Router DOM
+- **Data Visualization:** Recharts
+- **Icons:** Lucide React
+- **Data Processing:** PapaParse
+- **State Management:** React Context API, Custom Hooks (with localStorage persistence)
+
+The application employs a modular folder architecture separating contexts, reusable UI components, routing, and domain-specific feature modules.
+
+## Project Structure
 
 ```
 src/
- ├── components/
- │    ├── common/          # Reusable UI elements (DataTable, KPICard, AlertFeed, DetailPanel, States)
- │    ├── layout/          # Global layout structure (AppShell, Header, Sidebar, StatusBar)
- │    ├── dashboard/       # Dashboard widgets, timeline, charts, status grid
- │    ├── flights/         # Flight list, filters, stats, detail panel
- │    ├── gates/           # Gate map grid, events log, gate detail panel
- │    ├── baggage/         # Baggage overview, filters, baggage detail panel
- │    ├── passengers/      # Passenger profiles, check-in, passenger detail panel
- │    ├── security/        # Lane throughput metrics cards, screenings audit log
- │    ├── maintenance/     # Aircraft work orders logs, defect tracking, hold banners
- │    ├── staff/           # Staff rosters, compliance warnings, shift details
- │    └── retail/          # duty-free transactions, Recharts transaction flows
- ├── hooks/                # Custom React hooks (useFilter, useDebounce)
- ├── context/              # Context stores (DataContext, SimulationContext, AlertContext)
- ├── utils/                # Calculations, formatters, CSV PapaParse wrappers, cross-joins
- ├── types/                # TypeScript Interfaces and Types
- ├── router/               # React Router configurations
- ├── App.tsx               # Main application container
- ├── main.tsx              # React mounting entry point
- └── index.css             # Base styles with custom CSS design variables and Tailwind CSS
+├── components/
+│   ├── alerts/        # Alert Center and Feed components
+│   ├── common/        # Reusable UI components (DataTables, KPIs, Modals)
+│   ├── dashboard/     # High-level overview components
+│   ├── flights/       # Flight tracking and detail panels
+│   ├── gates/         # Gate mapping and event logs
+│   ├── layout/        # AppShell, Sidebar, Header, StatusBar
+│   └── retail/        # Commercial performance metrics
+├── context/           # React Contexts (Data, Simulation, Alerts)
+├── data/              # Static dataset parsing utilities
+├── hooks/             # Custom React hooks (useLocalStorage)
+├── router/            # React Router configuration
+├── types/             # TypeScript interfaces and type definitions
+├── utils/             # Formatters, helpers, and local storage utilities
+├── App.tsx            # Application entry point
+├── index.css          # Global Tailwind and custom CSS definitions
+└── main.tsx           # React DOM renderer
 ```
 
----
+## Responsive Design
 
-## 🛠️ Technology Stack & Styling
+The application is built with a mobile-first approach, scaling seamlessly up to large enterprise displays:
+- **Desktop (1024px+):** Full multi-pane layouts with persistent sidebars and expansive data tables.
+- **Tablet (768px+):** Collapsed auxiliary panels with optimized grid column counts.
+- **Mobile (320px+):** Hamburger navigation, vertical stacking of KPI cards, and scrollable table containers.
 
-- **Core Framework**: React 18 (TypeScript)
-- **Bundler & Tooling**: Vite 5
-- **Routing**: React Router DOM v6
-- **Styling**: Vanilla CSS variable overrides + Tailwind CSS utility styling for maximum layout responsiveness.
-- **Charts**: Recharts
-- **Data Loading**: PapaParse CSV parser (asynchronous client-side chunk loading).
-- **Icons**: Lucide React
+## Simulation Engine
 
-### Color & Aesthetic Tokens (Dark cockpit interface)
-- Base background color: `#0a0f1e`
-- Accent highlights: `#00d4ff` (cyan)
-- Alert warnings: `#ff6b35` (orange)
-- Critical states: `#ff3366` (pink-red)
-- Card surfaces: `#0d1b2a`
+The core of the AOCC is a deterministic simulation engine running entirely in the client browser.
+- **Simulation Clock:** Progresses time virtually from the dataset start date.
+- **Speed Controls:** Operators can pause or accelerate time (1x, 10x, 20x, 40x, 80x).
+- **Live Updates:** UI components react strictly to data filtered up to the `simulatedNow` timestamp.
+- **Alert Generation:** Anomalies trigger alerts exactly when the simulated clock reaches the incident timestamp.
 
----
+## Alert Lifecycle
 
-## 💡 Key Features Implemented
+The Alert Center implements a strict enterprise incident management workflow:
+1. **Created:** Alert is generated by the simulation engine based on operational anomalies.
+2. **Acknowledged:** Operator acknowledges the alert, removing it from the unacknowledged queue.
+3. **Investigating:** Operator actively reviews related records and metadata.
+4. **Resolved:** Operator manually marks the issue as resolved (or it auto-resolves if the underlying condition clears).
+5. **Closed:** Resolved alerts are automatically archived after a set period.
 
-1. **Unified Operations Dashboard**:
-   - At-a-glance KPI cards tracking Flights, On-Time %, Delayed Count, Total Passengers, and Active Alerts.
-   - Live alert ticker feed showing real-time exceptions.
-   - Dynamic charts tracking Flight Activity by Hour (line chart) and Delay Reasons (donut chart).
-   - Module status cards summarizing health metrics across all departments.
+## Cross Module Relationships
 
-2. **Flight Monitoring Module**:
-   - Complete flight schedule view with column sorting, paging, search (by Flight ID, Airline, Destination), and filters.
-   - Slide-out Flight Detail Panel with tabs showing: Passenger list, Baggage check-in logs, Gate events, Maintenance records, Retail transactions, and Assigned staff on duty.
+The AOCC emphasizes data interconnectedness:
+- **Flights & Gates:** Gate assignments directly link to flight schedules and delays.
+- **Passengers & Baggage:** Passenger records correlate with checked baggage throughput and potential security flags.
+- **Maintenance & Flights:** Maintenance holds prevent aircraft departure, directly impacting flight status.
+- **Alerts & All Modules:** The Alert Center serves as the connective tissue, surfacing critical events from any domain into a unified feed.
 
-3. **Gate Operations**:
-   - Visual gate map grid covering all 50 gates (B1–B50) colored by active flight statuses.
-   - Click a gate to filter the log of gate events or view the Gate Detail Panel containing assigned staff, current activities, and linked flight schedules.
+## Installation
 
-4. **Baggage Handling**:
-   - Tracks Checked Baggage, overweight anomalies (Economy >20kg, Business >32kg), and damaged items.
-   - Full bag lifecycle audit drawer linking back to passenger details and flight statuses.
+```bash
+# Install dependencies
+npm install
 
-5. **Passenger Management**:
-   - Demographics tracking (satisfaction scores, class upgrades, frequent flyer status, seat locations).
-   - Passenger details drawer mapping their PNR checking events, baggage tags, and security lane logs.
+# Start development server
+npm run dev
 
-6. **Security Lane Monitor**:
-   - Interactive lane throughput metrics for all 8 security checkpoints (total screenings, clear rates, average processing speed).
-   - Click a lane card to filter screening records. Alerts on flagged items or alarm triggers.
+# Build for production
+npm run build
 
-7. **Maintenance & Holds**:
-   - Prominent header warning system reporting Ground Holds.
-   - Work order severity level tracking, technican ID logs, defect logs, and aircraft AOG alerts.
+# Preview production build
+npm run preview
+```
 
-8. **Staff Shift Compliance**:
-   - Roster check mapping certifications and overtime hours.
-   - Real-time certification validity warnings matching the active simulated clock.
+## Build Validation
 
-9. **Commercial Retail Analytics**:
-   - Duty Free transaction registers with analytics charts tracking transactions count and hourly revenue totals (INR) using Recharts.
+The project enforces strict enterprise quality standards:
+- **TypeScript Validation:** Full static type checking across all data interfaces.
+- **Production Build:** Optimized bundling via Vite.
+- **Browser Compatibility:** Ensures standard layout behavior across modern WebKit and Chromium engines.
 
-10. **Incident Command Center (Alerts Page)**:
-    - Centralized log of derived alerts sorted by severity (AOG critical items, technical delays, expired credentials, flagged passenger screenings).
-    - Quick actions to acknowledge alerts or inspect/drill down directly to the original record with pre-applied filters.
+## Architecture
+
+- **Contexts:** Global state for static data, simulation clock, and active alerts.
+- **Utilities:** Pure functions for date formatting, local storage interactions, and alert generation.
+- **Components:** Modular, encapsulated UI elements preventing widespread re-renders.
+- **Routing:** Centralized route configuration mapping URLs to lazy-loaded modules.
+- **Data Loading:** Asynchronous CSV parsing on initialization via PapaParse.
+
+## Local Storage
+
+The application implements `localStorage` to persist non-sensitive user preferences and UI state across sessions:
+- Active simulation speed
+- Simulation pause/resume state
+
+*(Note: Raw datasets, derived analytics, and simulation history are explicitly NOT persisted to storage to maintain performance and data integrity.)*
+
+## Future Improvements
+
+- Authentication and Role-Based Access Control (RBAC)
+- Live backend integration via WebSocket streaming
+- Exporting capability for operational reports
+- Advanced analytics and predictive anomaly detection
+- Offline mode with Progressive Web App (PWA) support

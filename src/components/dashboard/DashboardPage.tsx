@@ -46,7 +46,7 @@ export default function DashboardPage() {
           </ChartWrapper>
         </div>
         <div className="flex flex-col h-full">
-          <div className="rounded-lg border border-border bg-bg-card p-4 flex flex-col h-full min-h-[380px] justify-between">
+          <div className="rounded-lg border border-border bg-bg-card p-4 flex flex-col h-full justify-between">
             <h3 className="mb-3 text-[16px] font-semibold text-text-primary flex items-center gap-1.5 shrink-0">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-critical opacity-75"></span>
@@ -62,11 +62,11 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <ChartWrapper title="Delay Reason Breakdown" height={280}>
+        <ChartWrapper title="Delay Reason Breakdown" height={220}>
           <DelayBreakdownChart flights={data.flights} />
         </ChartWrapper>
         <div className="flex flex-col h-full">
-          <div className="rounded-lg border border-border bg-bg-card p-4 flex flex-col h-full min-h-[340px] justify-between">
+          <div className="rounded-lg border border-border bg-bg-card p-4 flex flex-col h-full justify-between">
             <div>
               <h3 className="mb-3 text-[16px] font-semibold text-text-primary">Quick Stats</h3>
               <QuickStatsRow kpis={kpis} />

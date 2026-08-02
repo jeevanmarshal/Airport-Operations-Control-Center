@@ -48,7 +48,7 @@ export function timeAgo(d: Date | null | undefined, now: Date): string {
   if (!d) return '—';
   const diffMs = now.getTime() - d.getTime();
   const mins = Math.round(diffMs / 60000);
-  if (Math.abs(mins) < 1) return 'now';
+  if (Math.abs(mins) < 1) return 'Just now';
   const abs = Math.abs(mins);
   const unit = abs >= 1440 ? `${Math.round(abs / 1440)}d` : abs >= 60 ? `${Math.round(abs / 60)}h` : `${abs}m`;
   return mins > 0 ? `${unit} ago` : `in ${unit}`;

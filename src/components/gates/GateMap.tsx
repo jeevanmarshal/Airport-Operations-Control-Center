@@ -34,7 +34,7 @@ export default function GateMap({ flights, gateEvents, selectedGate, onSelectGat
   }, [gateEvents]);
 
   return (
-    <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 lg:grid-cols-10" role="grid" aria-label="Terminal 3 gate map, gates B1 through B50">
+    <div className="grid grid-cols-5 gap-2 sm:grid-cols-8 lg:grid-cols-10 xl:grid-cols-5" role="grid" aria-label="Terminal 3 gate map, gates B1 through B50">
       {ALL_GATES.map((gate) => {
         const gateFlights = flightsByGate[gate] ?? [];
         const delayed = gateFlights.filter((f) => f.delay_minutes > 0).length;

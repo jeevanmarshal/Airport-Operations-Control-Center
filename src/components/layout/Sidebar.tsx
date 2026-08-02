@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import AOCCLogo from '@/components/common/AOCCLogo';
 import {
   LayoutGrid, PlaneTakeoff, DoorOpen, Luggage, Users, ShieldCheck, Wrench, UserCog, ShoppingBag, Bell, X,
 } from 'lucide-react';
@@ -56,7 +57,10 @@ export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose:
       >
         {/* Mobile Header in Sidebar */}
         <div className="flex items-center justify-between px-4 pb-4 border-b border-border/60 lg:hidden mb-2">
-          <div className="text-[14px] font-bold text-accent-primary uppercase tracking-wider">AOCC Modules</div>
+          <div className="flex items-center gap-2">
+            <AOCCLogo className="h-6 w-6 shrink-0" />
+            <div className="text-[14px] font-bold text-accent-primary uppercase tracking-wider">AOCC Modules</div>
+          </div>
           <button
             type="button"
             onClick={onClose}

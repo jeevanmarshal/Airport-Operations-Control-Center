@@ -37,7 +37,7 @@ export default function StatusBar() {
           {isRunning ? 'Run' : 'Pause'}
         </button>
         <span className="h-4 w-px bg-border/60" />
-        {([1, 5, 10, 20] as SimSpeed[]).map((s) => (
+        {([1, 10, 20, 40, 80] as SimSpeed[]).map((s) => (
           <button
             key={s}
             type="button"

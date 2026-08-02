@@ -42,9 +42,24 @@ function useCountUp(target: number, decimals: number) {
 export default function KPICard({ label, value, unit, icon: Icon, statusColor = 'info', decimals = 0, subtext }: KPICardProps) {
   const isNumeric = typeof value === 'number';
   const animated = useCountUp(isNumeric ? value : 0, decimals);
+  
+  const [pulse, setPulse] = useState(false);
+  const prevValue = useRef(value);
+  
+  useEffect(() => {
+    if (prevValue.current !== value) {
+      setPulse(true);
+      const timer = setTimeout(() => setPulse(false), 800);
+      prevValue.current = value;
+      return () => clearTimeout(timer);
+    }
+  }, [value]);
+
   return (
     <div
-      className={`rounded-lg border border-border border-t-2 ${BORDER_COLOR[statusColor]} bg-bg-card p-4 transition-colors hover:bg-bg-elevated hover:border-accent-primary/60`}
+      className={`relative rounded-lg border border-border border-t-2 ${BORDER_COLOR[statusColor]} bg-bg-card p-4 transition-colors hover:bg-bg-elevated hover:border-accent-primary/60 ${
+        pulse ? 'animate-pulse-update' : ''
+      }`}
     >
       <div className="flex items-start justify-between">
         <span className="text-[11px] font-medium uppercase tracking-wider text-text-secondary">{label}</span>

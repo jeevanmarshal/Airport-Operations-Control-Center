@@ -34,25 +34,25 @@ export default function DataTable<T>({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="max-h-[65vh] overflow-auto rounded-lg border border-border scrollbar-thin">
+      <div className="max-h-[65vh] overflow-auto rounded-lg border border-border shadow-sm scrollbar-thin scroll-smooth">
         <table className="w-full border-collapse text-[13px]">
           <caption className="sr-only">{caption}</caption>
-          <thead className="sticky top-0 z-10 bg-bg-elevated">
+          <thead className="sticky top-0 z-10 bg-bg-elevated shadow-sm backdrop-blur-md bg-opacity-90">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
                   scope="col"
-                  className={`whitespace-nowrap border-b border-border px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide text-text-secondary ${col.sortable ? 'cursor-pointer select-none hover:text-accent-primary' : ''} ${col.className ?? ''}`}
+                  className={`whitespace-nowrap border-b border-border px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-text-secondary ${col.sortable ? 'cursor-pointer select-none hover:text-accent-primary transition-colors' : ''} ${col.className ?? ''}`}
                   onClick={col.sortable && onSort ? () => onSort(col.key) : undefined}
                   tabIndex={col.sortable ? 0 : undefined}
                   role={col.sortable ? 'button' : undefined}
                   aria-sort={sort?.key === col.key ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none'}
                   onKeyDown={col.sortable && onSort ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSort(col.key); } } : undefined}
                 >
-                  <span className="inline-flex items-center gap-1">
+                  <span className="inline-flex items-center gap-1.5">
                     {col.header}
-                    {col.sortable && sort?.key === col.key && (sort.dir === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
+                    {col.sortable && sort?.key === col.key && (sort.dir === 'asc' ? <ArrowUp size={12} className="text-accent-primary" /> : <ArrowDown size={12} className="text-accent-primary" />)}
                   </span>
                 </th>
               ))}
@@ -63,12 +63,12 @@ export default function DataTable<T>({
               <tr
                 key={rowKey(row)}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
-                className={`border-b border-border/60 ${i % 2 === 1 ? 'bg-bg-card/60' : 'bg-transparent'} ${onRowClick ? 'cursor-pointer hover:bg-bg-elevated hover:outline hover:outline-1 hover:outline-accent-primary/40' : ''}`}
+                className={`group border-b border-border/40 transition-all duration-200 ${i % 2 === 1 ? 'bg-bg-card/30' : 'bg-transparent'} ${onRowClick ? 'cursor-pointer hover:bg-bg-elevated hover:shadow-[inset_2px_0_0_0_#00d4ff] hover:bg-opacity-80' : ''}`}
                 tabIndex={onRowClick ? 0 : undefined}
                 onKeyDown={onRowClick ? (e) => { if (e.key === 'Enter') onRowClick(row); } : undefined}
               >
                 {columns.map((col) => (
-                  <td key={col.key} className={`px-3 py-2 align-middle text-text-primary ${col.className ?? ''}`}>
+                  <td key={col.key} className={`px-4 py-2.5 align-middle text-text-primary transition-colors group-hover:text-white ${col.className ?? ''}`}>
                     {col.render(row)}
                   </td>
                 ))}
