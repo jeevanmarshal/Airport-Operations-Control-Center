@@ -1,162 +1,192 @@
 # DEL Airport Operations Control Center (AOCC)
-Indira Gandhi International Airport
-Terminal 3 Operations Dashboard
 
-The DEL Airport Operations Control Center (AOCC) is a comprehensive, simulated, single-pane-of-glass dashboard designed for enterprise airport management. It visualizes operational data across multiple distinct modules, allowing operations staff to monitor, investigate, and resolve issues in real-time.
+The DEL Airport Operations Control Center (AOCC) is an enterprise-grade, single-pane-of-glass dashboard engineered for comprehensive airport management. It aggregates and visualizes operational data across distinct, highly interconnected domains—including flights, baggage handling, passenger flow, security screening, maintenance operations, staff scheduling, and retail analytics.
+
+## Live Demo
+
+**Production**  
+[https://airport-operations-control-center.vercel.app/](https://airport-operations-control-center.vercel.app/)  
+*The application is deployed on Vercel.*
+
+## Highlights
+
+- Unified AOCC dashboard
+- Client-side simulation engine
+- Incident and alert lifecycle
+- Cross-module navigation
+- Cockpit-style detail drawers
+- Interactive operational analytics
+- Responsive enterprise UI
+- LocalStorage persistence
+- Live KPI refresh animations
+- Smooth page transitions
 
 ## Overview
 
-The AOCC application addresses the fragmentation of information in airport operations by aggregating data from various departments—flights, baggage, security, maintenance, and retail—into one unified platform. 
-The system operates on a live-simulated operational dataset running from October 15, 2024, to December 30, 2024. The built-in simulation engine mimics real-time updates and automatically surfaces anomalies as alerts. Operations staff can navigate through specialized modules to investigate delays, manage bottlenecks, and ensure smooth terminal operations.
+The purpose of this project is to address the fragmentation of information in complex operational environments. By centralizing disparate data streams into a unified dashboard, operations staff can monitor, investigate, and resolve issues in real-time. 
+
+The application incorporates a simulation engine that mimics live updates by traversing a static dataset based on a virtual clock operating between October 15, 2024, and December 30, 2024. This simulates an enterprise environment where users observe operations dynamically, and an integrated alert system surfaces anomalies requiring immediate intervention.
 
 ## Features
 
-### Dashboard
-Provides a high-level executive summary of terminal operations, presenting key performance indicators (KPIs) for active flights, passenger throughput, security queue wait times, and unresolved critical alerts. 
+- **Dashboard**: High-level executive summary presenting active flight KPIs, passenger throughput, security queue wait times, and a live alert feed.
+- **Flights**: Real-time tracking of flight statuses, scheduled versus actual times, gate assignments, and delay metrics.
+- **Gate Operations**: Terminal 3 gate utilization maps and event logs tracking aircraft docking, cleaning, and maintenance holds.
+- **Baggage**: Throughput tracking, transfer counts, oversize baggage processing, and delay identification.
+- **Passengers**: Flow visualization, demographics, and booking class distributions to aid resource allocation.
+- **Security**: Wait time monitoring, lane throughput efficiency, and peak-hour anomaly detection.
+- **Maintenance**: Aircraft on Ground (AOG) monitoring, work order logging, and technician assignment tracking.
+- **Staff**: Shift monitoring, department allocations, and certification expiration tracking.
+- **Retail**: Commercial performance tracking, duty-free sales metrics, and hourly transaction flow volumes.
+- **Alerts**: Centralized incident management supporting acknowledgment, investigation, and resolution states.
+- **Simulation Engine**: Real-time data progression across a virtual timeline with manual playback controls.
+- **Responsive Design**: Adapts gracefully from multi-pane desktop layouts to mobile-optimized vertically stacked views.
+- **Cross-module relationships**: Deep linking between related records (e.g., clicking a flight routes to its assigned gate details).
+- **Detail Drawers**: Contextual slide-out panels providing deep-dive metrics without losing page state.
+- **Local Storage**: Persistence of specific UI preferences, such as the simulation playback speed.
+- **Animations**: Subtle, performant transitions during page routing and data updates.
 
-### Flights
-Tracks real-time flight statuses, expected arrival and departure times, gate assignments, and delay metrics. Interactive data tables support sorting, searching, and filtering to isolate delayed or specific carrier flights.
+## Design Principles
 
-### Gate Operations
-Monitors gate utilization across Terminal 3 (Gates B1 through B50). Includes a visual gate map indicating occupancy and statuses, alongside an event log tracking aircraft docking, cleaning, and maintenance holds.
-
-### Baggage
-Monitors baggage handling performance, tracking transfer counts, oversize baggage processing, and potential handling delays or damages.
-
-### Passenger Management
-Visualizes passenger flow and satisfaction metrics. Provides demographics, frequent flyer statistics, and booking class distributions to optimize terminal resource allocation.
-
-### Security
-Tracks security lane throughput and peak hour efficiency. Identifies anomalies, flagged passengers, and processing bottlenecks across different screening zones.
-
-### Maintenance
-Logs aircraft and terminal maintenance work orders. Highlights Aircraft on Ground (AOG) situations, technician assignments, and repair durations.
-
-### Staff
-Monitors staff shifts, department allocations, and certification expirations. Ensures adequate coverage for peak operational hours.
-
-### Retail
-Tracks commercial performance across terminal retail zones. Analyzes transaction volumes, duty-free sales, and revenue generation metrics.
-
-### Alert Center
-A centralized incident management system. Automatically generates alerts based on simulation anomalies (e.g., flight delays, critical maintenance). Supports a full acknowledgment and resolution lifecycle.
-
-### Simulation Engine
-A real-time state machine that progresses time through a statically loaded dataset. Includes playback controls (Pause, 1x, 10x, 20x, 40x, 80x) to observe historical operations at varying speeds.
-
-### Responsive Design
-Features a fully responsive layout with collapsible sidebar navigation, scalable UI elements, and horizontal-scrolling data tables, ensuring usability across desktop, tablet, and mobile form factors.
+- **Enterprise dashboard**: High information density suitable for operations centers.
+- **Dark cockpit theme**: High-contrast, fatigue-reducing palette optimized for continuous monitoring.
+- **Operational clarity**: Immediate visual surfacing of critical anomalies.
+- **Consistent component system**: Reusable components standardizing the visual language across modules.
+- **Responsive layouts**: Scalable interfaces optimized for varied display sizes.
+- **Minimal visual clutter**: Functional aesthetic prioritizing data over decoration.
 
 ## Technology Stack
 
-- **Framework:** React 18, TypeScript, Vite
-- **Styling:** Tailwind CSS
-- **Routing:** React Router DOM
-- **Data Visualization:** Recharts
-- **Icons:** Lucide React
-- **Data Processing:** PapaParse
-- **State Management:** React Context API, Custom Hooks (with localStorage persistence)
+- **Framework**: React 18
+- **Language**: TypeScript
+- **Bundler**: Vite
+- **Routing**: React Router DOM
+- **Charts**: Recharts
+- **Icons**: Lucide React
+- **Styling**: Tailwind CSS
+- **Data parsing**: PapaParse
+- **State management**: React Context API
+- **Utilities**: Custom Hooks
 
-The application employs a modular folder architecture separating contexts, reusable UI components, routing, and domain-specific feature modules.
+## Architecture
+
+- **Contexts**: Global state providers handling the simulation engine clock, raw datasets, and the centralized alert queue.
+- **Hooks**: Custom React hooks handling complex logic such as debounced searching, multi-field filtering, and pagination.
+- **Utilities**: Pure functions handling date formatting, currency conversions, and data aggregation.
+- **Generic components**: Reusable UI primitives (e.g., `DataTable`, `KPICard`, `ChartWrapper`) ensuring consistent design across domains.
+- **Feature modules**: Domain-specific directories encapsulating routes, context consumption, and layout structures.
+- **Routing**: Centralized configuration mapping URLs to lazy-loaded feature modules.
+- **Simulation**: A deterministic time loop that recalculates derived metrics and filters underlying arrays based on `simulatedNow`.
+- **Alert lifecycle**: A state machine handling incident progression from generation through closure.
 
 ## Project Structure
 
 ```
 src/
 ├── components/
-│   ├── alerts/        # Alert Center and Feed components
-│   ├── common/        # Reusable UI components (DataTables, KPIs, Modals)
-│   ├── dashboard/     # High-level overview components
-│   ├── flights/       # Flight tracking and detail panels
-│   ├── gates/         # Gate mapping and event logs
-│   ├── layout/        # AppShell, Sidebar, Header, StatusBar
-│   └── retail/        # Commercial performance metrics
-├── context/           # React Contexts (Data, Simulation, Alerts)
-├── data/              # Static dataset parsing utilities
-├── hooks/             # Custom React hooks (useLocalStorage)
-├── router/            # React Router configuration
-├── types/             # TypeScript interfaces and type definitions
-├── utils/             # Formatters, helpers, and local storage utilities
-├── App.tsx            # Application entry point
-├── index.css          # Global Tailwind and custom CSS definitions
-└── main.tsx           # React DOM renderer
+│   ├── alerts/
+│   ├── baggage/
+│   ├── common/
+│   ├── dashboard/
+│   ├── flights/
+│   ├── gates/
+│   ├── layout/
+│   ├── maintenance/
+│   ├── passengers/
+│   ├── retail/
+│   ├── security/
+│   └── staff/
+├── context/
+├── hooks/
+├── router/
+├── types/
+└── utils/
 ```
-
-## Responsive Design
-
-The application is built with a mobile-first approach, scaling seamlessly up to large enterprise displays:
-- **Desktop (1024px+):** Full multi-pane layouts with persistent sidebars and expansive data tables.
-- **Tablet (768px+):** Collapsed auxiliary panels with optimized grid column counts.
-- **Mobile (320px+):** Hamburger navigation, vertical stacking of KPI cards, and scrollable table containers.
 
 ## Simulation Engine
 
-The core of the AOCC is a deterministic simulation engine running entirely in the client browser.
-- **Simulation Clock:** Progresses time virtually from the dataset start date.
-- **Speed Controls:** Operators can pause or accelerate time (1x, 10x, 20x, 40x, 80x).
-- **Live Updates:** UI components react strictly to data filtered up to the `simulatedNow` timestamp.
-- **Alert Generation:** Anomalies trigger alerts exactly when the simulated clock reaches the incident timestamp.
+The core of the AOCC is a deterministic simulation engine running entirely in the client browser, designed to mock real-time data streaming.
+- **Simulated clock**: Progresses time virtually across the dataset timeline.
+- **Speed controls**: Adjusts the multiple at which time passes (1x, 10x, 20x, 40x, 80x).
+- **Pause/resume**: Halts or starts the virtual progression of time.
+- **Filtering logic**: Restricts the presentation of raw datasets strictly to records occurring before the current simulated timestamp.
+- **Reactive UI updates**: Subscribed components recalculate derived metrics seamlessly as the simulation clock advances.
 
 ## Alert Lifecycle
 
-The Alert Center implements a strict enterprise incident management workflow:
-1. **Created:** Alert is generated by the simulation engine based on operational anomalies.
-2. **Acknowledged:** Operator acknowledges the alert, removing it from the unacknowledged queue.
-3. **Investigating:** Operator actively reviews related records and metadata.
-4. **Resolved:** Operator manually marks the issue as resolved (or it auto-resolves if the underlying condition clears).
-5. **Closed:** Resolved alerts are automatically archived after a set period.
+The Alert Center implements a strict enterprise incident management workflow.
+- **Created**: Anomalies trigger the generation of a new incident.
+- **Acknowledged**: Operators confirm awareness, removing the alert from the critical unacknowledged queue.
+- **Investigating**: Operators actively review correlated records and metadata.
+- **Resolved**: Operators manually mark the issue as mitigated (or it auto-resolves if the underlying condition clears).
+- **Closed**: Resolved alerts are archived and purged from active operational views.
 
-## Cross Module Relationships
+Global notification counts strictly reflect unresolved, active alerts to prioritize operator attention.
 
-The AOCC emphasizes data interconnectedness:
-- **Flights & Gates:** Gate assignments directly link to flight schedules and delays.
-- **Passengers & Baggage:** Passenger records correlate with checked baggage throughput and potential security flags.
-- **Maintenance & Flights:** Maintenance holds prevent aircraft departure, directly impacting flight status.
-- **Alerts & All Modules:** The Alert Center serves as the connective tissue, surfacing critical events from any domain into a unified feed.
+## Local Storage
+
+The application utilizes `localStorage` exclusively for persisting non-sensitive user UI preferences across sessions:
+- Simulation speed
+- Pause/resume state
+
+Raw operational datasets and derived analytics are intentionally NOT persisted to local storage, maintaining performance limits and ensuring data integrity upon reload.
+
+## Performance Optimizations
+
+The application implements several optimization techniques to maintain a smooth 60fps experience:
+- **Memoization**: Extensive use of `useMemo` and `useCallback` to prevent expensive array filtering on every render.
+- **Reusable components**: Standardized generic UI components minimize DOM bloat.
+- **Client-side filtering**: Optimized custom hooks manage in-memory pagination, sorting, and filtering without blocking the main thread.
+- **Context separation**: Distinct Context providers localize state updates, preventing global clock ticks from needlessly re-rendering static elements.
+- **Smooth transitions**: Framer-motion style structural CSS transitions during route changes.
+- **Sticky headers**: Preserved table contexts during extensive vertical scrolling.
+- **Responsive tables**: Horizontal-scrolling data tables preventing layout breaks on small displays.
+
+## Responsive Design
+
+The application scales seamlessly to large enterprise NOC (Network Operations Center) displays and mobile devices:
+- **Desktop**: Full multi-pane layouts utilizing persistent sidebars and expansive grids.
+- **Tablet**: Collapsed auxiliary panels with optimized grid column structures.
+- **Mobile**: Drawer-based navigation menus and vertically stacked components.
+- **Sidebar behavior**: Fixed position on large screens, sliding overlay on smaller devices.
+- **Detail drawer behavior**: Contextual slide-out panels that adapt from partial screen overlays on desktop to full-screen modals on mobile.
+- **Table responsiveness**: Data-dense tables allow horizontal scrolling while preserving column headers and crucial identifying columns.
 
 ## Installation
 
 ```bash
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev
-
-# Build for production
 npm run build
-
-# Preview production build
 npm run preview
 ```
 
 ## Build Validation
 
-The project enforces strict enterprise quality standards:
-- **TypeScript Validation:** Full static type checking across all data interfaces.
-- **Production Build:** Optimized bundling via Vite.
-- **Browser Compatibility:** Ensures standard layout behavior across modern WebKit and Chromium engines.
+The project enforces strict enterprise quality standards during CI/CD workflows:
+- **TypeScript validation**: Full static type checking across all data interfaces.
+- **Production build**: Optimized bundling and minification.
+- **Vite**: Ultra-fast hot module replacement during development and Rollup-based production builds.
 
-## Architecture
+## Roadmap
 
-- **Contexts:** Global state for static data, simulation clock, and active alerts.
-- **Utilities:** Pure functions for date formatting, local storage interactions, and alert generation.
-- **Components:** Modular, encapsulated UI elements preventing widespread re-renders.
-- **Routing:** Centralized route configuration mapping URLs to lazy-loaded modules.
-- **Data Loading:** Asynchronous CSV parsing on initialization via PapaParse.
+Future improvements:
+- Backend API integration
+- WebSockets for real-time synchronization
+- Authentication
+- RBAC (Role-Based Access Control)
+- Export reports
+- PWA (Progressive Web App)
+- Multi-airport support
+- Predictive analytics
 
-## Local Storage
+## Repository Information
 
-The application implements `localStorage` to persist non-sensitive user preferences and UI state across sessions:
-- Active simulation speed
-- Simulation pause/resume state
+**Repository Name**  
+Airport-Operations-Control-Center
 
-*(Note: Raw datasets, derived analytics, and simulation history are explicitly NOT persisted to storage to maintain performance and data integrity.)*
+**Description**  
+Enterprise-style Airport Operations Control Center (AOCC) for DEL Terminal 3 featuring a real-time simulation engine, incident management, operational dashboards, and cross-module analytics.
 
-## Future Improvements
-
-- Authentication and Role-Based Access Control (RBAC)
-- Live backend integration via WebSocket streaming
-- Exporting capability for operational reports
-- Advanced analytics and predictive anomaly detection
-- Offline mode with Progressive Web App (PWA) support
+**Topics**  
+`react`, `typescript`, `vite`, `tailwindcss`, `airport`, `dashboard`, `operations`, `analytics`, `simulation`, `aviation`, `aocc`, `enterprise-dashboard`, `recharts`, `papaparse`, `responsive-design`

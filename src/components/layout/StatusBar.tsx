@@ -14,12 +14,13 @@ export default function StatusBar() {
 
   return (
     <footer className="flex h-9 shrink-0 items-center justify-between border-t border-border bg-bg-card px-4 text-[11px] text-text-secondary">
-      <span className="flex items-center gap-1.5">
-        <span className="relative flex h-1.5 w-1.5">
+      <span className="flex items-center gap-1.5 whitespace-nowrap overflow-hidden shrink pr-2">
+        <span className="relative flex h-1.5 w-1.5 shrink-0">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-ok opacity-75"></span>
           <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-status-ok"></span>
         </span>
-        Last updated: <span className="font-data text-text-primary">{formatDateTime(simulatedNow)}</span>
+        <span className="hidden sm:inline">Last updated:</span> 
+        <span className="font-data text-text-primary truncate">{formatDateTime(simulatedNow)}</span>
       </span>
       <span className="hidden sm:inline">Data source: static dataset (8 tables) · <span className="font-data">{totalRecords.toLocaleString('en-IN')}</span> records loaded</span>
       <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
