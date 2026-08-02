@@ -81,8 +81,7 @@ export default function StaffDetailPanel({
 
         <DetailSection title="Shift Details">
           <DetailField label="Shift Date" value={staff.shift_date ? new Date(staff.shift_date).toLocaleDateString() : 'N/A'} />
-          <DetailField label="Shift Start" value={formatDateTime(staff.shift_start)} />
-          <DetailField label="Shift End" value={formatDateTime(staff.shift_end)} />
+          <DetailField label="Shift Window" value={`${String(staff.shift_hour).padStart(2, '0')}:00 - ${String((staff.shift_hour + staff.hours_worked) % 24).padStart(2, '0')}:00`} />
           {staff.is_overtime && staff.overtime_hours && (
             <DetailField label="Overtime Hours" value={`${staff.overtime_hours} hrs`} className="text-status-warning font-bold" />
           )}
